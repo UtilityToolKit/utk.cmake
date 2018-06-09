@@ -1,0 +1,35 @@
+#ifndef @PROJECT_NAME@_VERSION_H
+#define @PROJECT_NAME@_VERSION_H
+
+
+#include <stdint.h>
+
+#include "@i_EXPORT_HEADER@"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+@i_EXPORT_MACRO@ unsigned int @i_VERSIONED_ENTITY@_versionMajor ();
+
+
+@i_EXPORT_MACRO@ unsigned int @i_VERSIONED_ENTITY@_versionMinor ();
+
+
+@i_EXPORT_MACRO@ unsigned int @i_VERSIONED_ENTITY@_versionPatch ();
+
+
+@i_EXPORT_MACRO@ const char* @i_VERSIONED_ENTITY@_versionGitInfo ();
+
+
+@i_EXPORT_MACRO@ const char* @i_VERSIONED_ENTITY@_versionFullString ();
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif /* @PROJECT_NAME@_VERSION_H */
