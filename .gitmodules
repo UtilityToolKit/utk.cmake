@@ -1,0 +1,8 @@
+[submodule "bwrsandman/CMakeHelpers"]
+	path = CMakeHelpers
+	url = https://github.com/Innokentiy-Alaytsev/CMakeHelpers.git
+	branch = master
+[submodule "Crascit/DownloadProject"]
+	path = DownloadProject
+	url = https://github.com/Innokentiy-Alaytsev/DownloadProject.git
+	branch = master

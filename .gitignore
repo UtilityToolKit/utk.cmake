@@ -1,0 +1,10 @@
+*.pro.user
+build*/*
+dist*/*
+x86
+x86_64
+.dir-locals.el
+.dir-locals.elc
+
+*~*
+*#*
