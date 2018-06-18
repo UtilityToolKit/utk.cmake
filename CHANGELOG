@@ -1,0 +1,34 @@
+Version 0.1.0 (2018-06-18)
+
+    The first release.
+
+    + Build and install options helper module
+
+      The module provides the utk_cmake_build_and_install_options() function to
+      simplify creation of build and install options for the project.
+
+    + Package functions module
+
+      The module provides functions that simplify working with packages.
+
+    + List functions module
+
+    + Target functions module
+
+      The module provides functions and properties that simplify working with
+      targets: creation, setting properties, adding sources, etc.
+
+    + Miscellaneous utility functions module
+
+      The module provides functions that are not yet in any other module.
+
+    + Product information module
+
+      The module provides functions and properties to support generating of
+      product information functions and embedding of product information in
+      artefacts under Win32.
+
+    + Installation module
+
+      Adds install target to install libraries, executables and other files,
+      associated with the given target(s).
