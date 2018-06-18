@@ -6,3 +6,7 @@
 	path = DownloadProject
 	url = https://github.com/Innokentiy-Alaytsev/DownloadProject.git
 	branch = master
+[submodule "axr/solar-cmake"]
+	path = solar-cmake
+	url = https://github.com/Innokentiy-Alaytsev/solar-cmake
+	branch = master

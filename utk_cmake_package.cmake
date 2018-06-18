@@ -1,0 +1,196 @@
+#############################################################################
+# Copyright 2018 Utility Tool Kit Open Source Contributors (see CREDITS.md) #
+#                                                                           #
+# Licensed under the Apache License, Version 2.0 (the "License");           #
+# you may not use this file except in compliance with the License.          #
+# You may obtain a copy of the License at                                   #
+#                                                                           #
+#     http://www.apache.org/licenses/LICENSE-2.0                            #
+#                                                                           #
+# Unless required by applicable law or agreed to in writing, software       #
+# distributed under the License is distributed on an "AS IS" BASIS,         #
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  #
+# See the License for the specific language governing permissions and       #
+# limitations under the License.                                            #
+#############################################################################
+
+
+cmake_minimum_required (VERSION 3.3)
+
+set (UTK_CMAKE_PACKAGE_MODULE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+include (${UTK_CMAKE_PACKAGE_MODULE_DIRECTORY}/utk_cmake_list.cmake)
+include (${UTK_CMAKE_PACKAGE_MODULE_DIRECTORY}/DownloadProject/DownloadProject.cmake)
+
+
+# @function utk_cmake_find_or_download_package
+#
+# @brief Allows to use system-provided package or download package from remote
+#        repository and build it as a part of the project.
+#
+# @details Package downloading is implemented with DownloadProject
+#          (https://github.com/Innokentiy-Alaytsev/DownloadProject.git) CMake
+#          module.
+#
+# @param [in] DOWNLOAD_AND_BUILD_BY_DEFAULT - when set the option
+#                                             DOWNLOADANDBUILD_${PACKAGE} will
+#                                             be set by default.
+#
+# @param [in] PACKAGE - the name of the package to find or download.
+#
+# @param [in] FOLDER - the name of the directory where the IMPORTED_TARGET will
+#                      reside if USE_FOLDERS global property is set to TRUE.
+#
+# @param [in] FIND_PACKAGE_TARGET - the name of the IMPORTED target that will be
+#                                   the result of the call to the find_package()
+#                                   function; defaults to PACKAGE.
+#
+# @param [in] DOWNLOADED_TARGET - the name of the target that will be the result
+#                                 of downloading the PACKAGE and adding it's
+#                                 source directory into the project source tree;
+#                                 defaults to PACKAGE.
+#
+# @param [in] IMPORTED_TARGET - the name of the variable in the PARENT SCOPE to
+#                               store FIND_PACKAGE_TARGET or DOWNLOADED_TARGET
+#                               value depending on whether the PACKAGE is found
+#                               using the find_package() function or downloaded.
+#
+# @param [in] FIND_PACKAGE_OPTIONS - options to pass to the find_package()
+#                                    function.
+#
+# @param [in] DOWNLOAD_OPTIONS - options to pass to the download_project()
+#                                function.
+#
+# @param [in] DOWNLOAD_OPTIONS_WITH_OVERRIDE - a list of DOWNLOAD_OPTIONS that
+#                                              may be overridden by the user; an
+#                                              option
+#                                              DOWNLOADANDBUILD_${PACKAGE}_<OPTION>
+#                                              will be added.
+function (utk_cmake_find_or_download_package)
+  set (_options
+    DOWNLOAD_AND_BUILD_BY_DEFAULT
+    )
+  set (_one_value_args
+    PACKAGE
+    FOLDER
+    FIND_PACKAGE_TARGET
+    DOWNLOADED_TARGET
+    IMPORTED_TARGET
+    )
+  set (_multi_value_args
+    FIND_PACKAGE_OPTIONS
+    DOWNLOAD_OPTIONS
+    DOWNLOAD_OPTIONS_WITH_OVERRIDE
+    )
+
+  cmake_parse_arguments (i
+    "${_options}" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
+
+  option (DOWNLOADANDBUILD_${i_PACKAGE}
+    "Download and build ${i_PACKAGE} (ON) or use system provided package (OFF)"
+    ${i_DOWNLOAD_AND_BUILD_BY_DEFAULT}
+    )
+
+  if (NOT DEFINED i_DOWNLOADED_TARGET)
+    set (i_DOWNLOADED_TARGET ${i_PACKAGE})
+  endif(NOT DEFINED i_DOWNLOADED_TARGET)
+
+  if (NOT DEFINED i_FIND_PACKAGE_TARGET)
+    set (i_FIND_PACKAGE_TARGET ${i_PACKAGE})
+  endif(NOT DEFINED i_FIND_PACKAGE_TARGET)
+
+  set (_imported_target "")
+
+  if (DOWNLOADANDBUILD_${i_PACKAGE})
+    set (_imported_target ${i_DOWNLOADED_TARGET})
+
+    foreach (_overridable_option IN LISTS i_DOWNLOAD_OPTIONS_WITH_OVERRIDE)
+      if ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
+        _utk_cmake_download_option_override (
+          PACKAGE "${i_PACKAGE}"
+          OPTION_NAME "${_overridable_option}"
+          OPTION_LIST ${i_DOWNLOAD_OPTIONS}
+          OUTPUT i_DOWNLOAD_OPTIONS
+          )
+      else ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
+        message (
+          SEND_ERROR
+          "Impossible to override download option \"${_overridable_option}\" that is not provided")
+      endif ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
+    endforeach (_overridable_option IN LISTS i_DOWNLOAD_OPTIONS_WITH_OVERRIDE)
+
+    if (CMAKE_VERSION VERSION_LESS 3.2)
+      set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+    else()
+      set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+    endif()
+
+    download_project (
+      PROJ                ${i_PACKAGE}
+      ${i_DOWNLOAD_OPTIONS}
+      ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+
+    add_subdirectory (
+      ${${i_PACKAGE}_SOURCE_DIR}
+      ${${i_PACKAGE}_BINARY_DIR})
+  else ()
+    find_package (${i_PACKAGE} ${i_FIND_PACKAGE_OPTIONS})
+
+    set (_imported_target ${i_FIND_PACKAGE_TARGET})
+  endif ()
+
+  if (i_FOLDER)
+    set_target_properties (
+      ${_imported_target}
+      PROPERTIES
+      FOLDER ${i_FOLDER}
+      )
+  endif ()
+
+  set (${i_IMPORTED_TARGET} ${_imported_target} PARENT_SCOPE)
+endfunction (utk_cmake_find_or_download_package)
+
+
+######################
+# Internal functions #
+######################
+function (_utk_cmake_download_option_override)
+  set (_multi_value_args
+    OPTION_LIST
+    )
+  set (_one_value_args
+    PACKAGE
+    OPTION_NAME
+    OUTPUT
+    )
+
+  cmake_parse_arguments (i
+    "${_options}" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
+
+  option (DOWNLOADANDBUILD_${i_PACKAGE}_OVERRIDE_${i_OPTION_NAME}
+    "Enables override of the \"${i_OPTION_NAME}\" option used to fetch package sources with ExternalProject"
+    OFF
+    )
+
+  if (DOWNLOADANDBUILD_${i_PACKAGE}_OVERRIDE_${i_OPTION_NAME})
+    utk_cmake_get_named_option (
+      OPTION_LIST ${i_OPTION_LIST}
+      OPTION_NAME "${i_OPTION_NAME}"
+      OUTPUT _option_value)
+
+    set (DOWNLOADANDBUILD_${i_PACKAGE}_ALTERNATIVE_${i_OPTION_NAME}
+      "${_option_value}"
+      CACHE
+      STRING
+      "\"${i_OPTION_NAME}\" used to override the one provided in project configuration"
+      )
+
+    utk_cmake_set_named_option (
+      OPTION_LIST ${i_OPTION_LIST}
+      OPTION_NAME "${i_OPTION_NAME}"
+      OPTION_VALUE "${DOWNLOADANDBUILD_${i_PACKAGE}_ALTERNATIVE_${i_OPTION_NAME}}"
+      OUTPUT _option_list)
+
+    set (${i_OUTPUT} ${_option_list} PARENT_SCOPE)
+  endif(DOWNLOADANDBUILD_${i_PACKAGE}_OVERRIDE_${i_OPTION_NAME})
+endfunction (_utk_cmake_download_option_override)
