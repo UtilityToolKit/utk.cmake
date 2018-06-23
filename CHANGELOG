@@ -1,3 +1,18 @@
+Version 0.2.0 (2018-06-23)
+
+    New features:
+
+    * Added options for tests building and installation configuration
+
+
+    Fixed problems:
+
+    * Fixed handling of the situation the downloaded dependency is required
+      multiple times
+
+    * Fixed and improved toolset-based mangling for MSVS with LLVM toolset
+
+
 Version 0.1.0 (2018-06-18)
 
     The first release.
