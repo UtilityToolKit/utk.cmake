@@ -45,6 +45,10 @@
 # @param [in] STATIC_LIBRARY_ENABLED - the default value of the flag for
 #                                      building STATIC_LIBRARY target type.
 #
+# @param [in] TESTS - add options for building and installing tests.
+#
+# @param [in] TESTS_ENABLED - the default value of the flag for building tests.
+#
 # @param [in] OPTION_PREFIX - a prefix used to format option names. If a prefix
 #                             is not provided then the ${PROJECT_NAME} is used.
 function (utk_cmake_build_and_install_options)
@@ -55,6 +59,8 @@ function (utk_cmake_build_and_install_options)
     SHARED_LIBRARY_ENABLED
     STATIC_LIBRARY
     STATIC_LIBRARY_ENABLED
+    TESTS
+    TESTS_ENABLED
     )
   set (_multi_value_args
     ""
@@ -74,7 +80,8 @@ function (utk_cmake_build_and_install_options)
       (i_EXECUTABLE OR
         i_MODULE_LIBRARY OR
         i_SHARED_LIBRARY OR
-        i_STATIC_LIBRARY))
+        i_STATIC_LIBRARY OR
+        i_TESTS))
     message (SEND_ERROR "No options provided")
 
     return ()
@@ -108,5 +115,12 @@ function (utk_cmake_build_and_install_options)
   elseif (i_STATIC_LIBRARY)
     set (${i_OPTION_PREFIX}_BUILD_SHARED_LIBRARY false PARENT_SCOPE)
     set (${i_OPTION_PREFIX}_BUILD_STATIC_LIBRARY true PARENT_SCOPE)
+  endif ()
+
+  if (i_TESTS)
+    option (${i_OPTION_PREFIX}_BUILD_TESTS
+      "Build tests" ${i_TESTS_ENABLED})
+    option (${i_OPTION_PREFIX}_INSTALL_TESTS
+      "Install tests with other executables" false)
   endif ()
 endfunction (utk_cmake_build_and_install_options)
