@@ -27,6 +27,7 @@ if (WIN32)
 endif ()
 
 
+# Common target properties
 define_property (TARGET
   PROPERTY UTK_CMAKE_GIT_DESCRIBE
   BRIEF_DOCS "Advanced version info for developers"
@@ -55,6 +56,36 @@ define_property (TARGET
   PROPERTY UTK_CMAKE_PROJECT_INFO_HEADER
   BRIEF_DOCS "The name of the header with generated project information functions"
   FULL_DOCS "The property is only set if project information functions were generated.")
+
+# INTERFACE_LIBRARY target properties
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_GIT_DESCRIBE
+  BRIEF_DOCS "Advanced version info for developers"
+  FULL_DOCS "String with information that is important for developers during
+  development process. This information includes git commit hash, durty status
+  of repo, distance from the last tag. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_GIT_UNTRACKED_FILES
+  BRIEF_DOCS "Information about presence of untracked files"
+  FULL_DOCS "Used in helper functions generation to add .with-untracked suffix
+  to version string. Suffix is only added if there are some untracked not
+  ignored files in repository. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_LANGUAGE
+  BRIEF_DOCS "The main target programming language"
+  FULL_DOCS "This property is used to generate version information functions in the way that suits the language best. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_PROJECT_CXX_NAMESPACE
+  BRIEF_DOCS "A list that represents hierarchy of the main project namespace"
+  FULL_DOCS "Each item in the list represents a namespace that is nested inside the namespace, named by the previous list item. If the item value is \"inline\" then the next item represents the namespace with the \"inline\" attribute. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_PROJECT_INFO_HEADER
+  BRIEF_DOCS "The name of the header with generated project information functions"
+  FULL_DOCS "The property is only set if project information functions were generated. This property is intended to be used with INTERFACE_LIBRARY targets.")
 
 
 # @function utk_cmake_product_information

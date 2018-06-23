@@ -16,6 +16,12 @@
 
 
 define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_INCLUDE_PREFIX
+  BRIEF_DOCS "Prefix added to all target file names"
+  FULL_DOCS "This is the part of path between include root and target header files (e.g. /usr/local/include/<UTK_CMAKE_INCLUDE_PREFIX>/<header file name>). This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+
+define_property (TARGET
   PROPERTY UTK_CMAKE_INCLUDE_PREFIX
   BRIEF_DOCS "Prefix added to all target file names"
   FULL_DOCS "This is the part of path between include root and target header files (e.g. /usr/local/include/<UTK_CMAKE_INCLUDE_PREFIX>/<header file name>).")
