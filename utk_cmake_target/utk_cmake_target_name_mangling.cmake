@@ -107,9 +107,39 @@ function (utk_cmake_name_mangling_postfix)
     set (_mangling_postfix "")
 
     if (MSVC)
-      set (
-        _mangling_postfix
-        "${_mangling_postfix}-${CMAKE_VS_PLATFORM_TOOLSET}-mt")
+      if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
+        set (_compatible_toolsets "${CMAKE_VS_PLATFORM_TOOLSET}")
+
+        if("${CMAKE_VS_PLATFORM_TOOLSET}" STREQUAL "LLVM-vs2010")
+          list (APPEND _compatible_toolsets "vc100")
+          set(_predered_toolset "vc100")
+        elseif("${CMAKE_VS_PLATFORM_TOOLSET}" STREQUAL "LLVM-vs2012")
+          list (APPEND _compatible_toolsets "vc110")
+          set(_predered_toolset "vc110")
+        elseif("${CMAKE_VS_PLATFORM_TOOLSET}" STREQUAL "LLVM-vs2013")
+          list (APPEND _compatible_toolsets "vc120")
+          set(_predered_toolset "vc120")
+        elseif("${CMAKE_VS_PLATFORM_TOOLSET}" STREQUAL "LLVM-vs2014")
+          list (APPEND _compatible_toolsets "vc140;vc141")
+          set(_predered_toolset "vc140")
+        endif()
+
+        set ("${_target}_VS_TOOLSET_MANGLING"
+          "${_predered_toolset}" CACHE STRING
+          "Mangling component to describe the toolset")
+
+        set_property (
+          CACHE "${_target}_VS_TOOLSET_MANGLING"
+          PROPERTY STRINGS ${_compatible_toolsets})
+
+        set (
+          _mangling_postfix
+          "${_mangling_postfix}-${${_target}_VS_TOOLSET_MANGLING}-mt")
+      else ()
+        set (
+          _mangling_postfix
+          "${_mangling_postfix}-${CMAKE_VS_PLATFORM_TOOLSET}-mt")
+      endif ()
     endif (MSVC)
 
     if (_target_type STREQUAL "STATIC_LIBRARY")
