@@ -1,3 +1,15 @@
+Version 0.3.0 (2018-06-23)
+
+    New features:
+
+    * UTK_CMAKE_EXPORT_HEADER and UTK_CMAKE_EXPORT_MACRO properties are now
+      mandatory for non-INTERFACE_LIBRARY targets
+
+
+    Fixed problems:
+
+    * Fixed support of INTERFACE_TARGET targets (#2)
+
 Version 0.2.0 (2018-06-23)
 
     New features:
