@@ -149,14 +149,27 @@ function (utk_cmake_target_include_directories)
   endif ()
 
   foreach (_target IN LISTS i_TARGET)
-    target_include_directories (${_target}
-      INTERFACE
-      ${i_INTERFACE}
-      PRIVATE
-      ${i_PRIVATE}
-      PUBLIC
-      ${i_PUBLIC}
-      )
+    get_target_property (_target_type "${_target}" TYPE)
+
+    if (_target_type STREQUAL "INTERFACE_LIBRARY")
+      if (i_PRIVATE OR i_PUBLIC)
+        message (WARNING "Only INTERFACE include directories are supported by INTERFACE_LIBRARY targets. The provided PRIVATE and/or PUBLIC sources will be ignored.")
+      endif ()
+
+      target_include_directories (${_target}
+        INTERFACE
+        ${i_INTERFACE}
+        )
+    else ()
+      target_include_directories (${_target}
+        INTERFACE
+        ${i_INTERFACE}
+        PRIVATE
+        ${i_PRIVATE}
+        PUBLIC
+        ${i_PUBLIC}
+        )
+    endif ()
   endforeach (_target IN LISTS i_TARGET)
 endfunction (utk_cmake_target_include_directories)
 
@@ -214,6 +227,16 @@ function (utk_cmake_target_link_libraries)
           PROPERTY LINK_LIBRARIES ${_library})
       endforeach ()
     elseif (
+        _target_type STREQUAL "INTERFACE_LIBRARY")
+      if (i_PRIVATE OR i_PUBLIC)
+        message (WARNING "Only INTERFACE link libraries are supported by INTERFACE_LIBRARY targets. The provided PRIVATE and/or PUBLIC link libraries will be ignored.")
+      endif ()
+
+      target_link_libraries (${_target}
+        INTERFACE
+        ${i_INTERFACE}
+        )
+    elseif (
         _target_type STREQUAL "EXECUTABLE" OR
         _target_type STREQUAL "MODULE_LIBRARY" OR
         _target_type STREQUAL "SHARED_LIBRARY" OR
@@ -261,13 +284,26 @@ function (utk_cmake_target_sources)
   endif ()
 
   foreach (_target IN LISTS i_TARGET)
-    target_sources (${_target}
-      INTERFACE
-      ${i_INTERFACE}
-      PRIVATE
-      ${i_PRIVATE}
-      PUBLIC
-      ${i_PUBLIC}
-      )
+    get_target_property (_target_type "${_target}" TYPE)
+
+    if (_target_type STREQUAL "INTERFACE_LIBRARY")
+      if (i_PRIVATE OR i_PUBLIC)
+        message (WARNING "Only INTERFACE sources are supported by INTERFACE_LIBRARY targets. The provided PRIVATE and/or PUBLIC sources will be ignored.")
+      endif ()
+
+      target_sources (${_target}
+        INTERFACE
+        ${i_INTERFACE}
+        )
+    else ()
+      target_sources (${_target}
+        INTERFACE
+        ${i_INTERFACE}
+        PRIVATE
+        ${i_PRIVATE}
+        PUBLIC
+        ${i_PUBLIC}
+        )
+    endif ()
   endforeach (_target IN LISTS i_TARGET)
 endfunction (utk_cmake_target_sources)
