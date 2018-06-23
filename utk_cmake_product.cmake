@@ -605,6 +605,13 @@ function (_utk_cmake_target_info_functions)
 
     get_target_property (TARGET_EXPORT_MACRO
 	  ${i_TARGET}  UTK_CMAKE_EXPORT_MACRO)
+
+    if (NOT TARGET_EXPORT_HEADER OR
+        NOT TARGET_EXPORT_MACRO)
+      message (SEND_ERROR "UTK_CMAKE_EXPORT_HEADER and/or UTK_CMAKE_EXPORT_MACRO property was not set.")
+
+      return ()
+    endif ()
   endif ()
 
   _utk_cmake_target_version (
