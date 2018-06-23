@@ -27,6 +27,7 @@ if (WIN32)
 endif ()
 
 
+# Common target properties
 define_property (TARGET
   PROPERTY UTK_CMAKE_GIT_DESCRIBE
   BRIEF_DOCS "Advanced version info for developers"
@@ -42,6 +43,11 @@ define_property (TARGET
   ignored files in repository.")
 
 define_property (TARGET
+  PROPERTY UTK_CMAKE_LANGUAGE
+  BRIEF_DOCS "The main target programming language"
+  FULL_DOCS "This property is used to generate version information functions in the way that suits the language best.")
+
+define_property (TARGET
   PROPERTY UTK_CMAKE_PROJECT_CXX_NAMESPACE
   BRIEF_DOCS "A list that represents hierarchy of the main project namespace"
   FULL_DOCS "Each item in the list represents a namespace that is nested inside the namespace, named by the previous list item. If the item value is \"inline\" then the next item represents the namespace with the \"inline\" attribute.")
@@ -50,6 +56,36 @@ define_property (TARGET
   PROPERTY UTK_CMAKE_PROJECT_INFO_HEADER
   BRIEF_DOCS "The name of the header with generated project information functions"
   FULL_DOCS "The property is only set if project information functions were generated.")
+
+# INTERFACE_LIBRARY target properties
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_GIT_DESCRIBE
+  BRIEF_DOCS "Advanced version info for developers"
+  FULL_DOCS "String with information that is important for developers during
+  development process. This information includes git commit hash, durty status
+  of repo, distance from the last tag. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_GIT_UNTRACKED_FILES
+  BRIEF_DOCS "Information about presence of untracked files"
+  FULL_DOCS "Used in helper functions generation to add .with-untracked suffix
+  to version string. Suffix is only added if there are some untracked not
+  ignored files in repository. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_LANGUAGE
+  BRIEF_DOCS "The main target programming language"
+  FULL_DOCS "This property is used to generate version information functions in the way that suits the language best. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_PROJECT_CXX_NAMESPACE
+  BRIEF_DOCS "A list that represents hierarchy of the main project namespace"
+  FULL_DOCS "Each item in the list represents a namespace that is nested inside the namespace, named by the previous list item. If the item value is \"inline\" then the next item represents the namespace with the \"inline\" attribute. This property is intended to be used with INTERFACE_LIBRARY targets.")
+
+define_property (TARGET
+  PROPERTY INTERFACE_UTK_CMAKE_PROJECT_INFO_HEADER
+  BRIEF_DOCS "The name of the header with generated project information functions"
+  FULL_DOCS "The property is only set if project information functions were generated. This property is intended to be used with INTERFACE_LIBRARY targets.")
 
 
 # @function utk_cmake_product_information
@@ -427,9 +463,15 @@ function (_utk_cmake_target_function_name_prefix)
     LANGUAGE _target_language
     )
 
-  get_target_property (
-    _target_namespace "${i_TARGET}" UTK_CMAKE_PROJECT_CXX_NAMESPACE)
   get_target_property (_target_type "${i_TARGET}" TYPE)
+
+  if (_target_type STREQUAL "INTERFACE_LIBRARY")
+    set (_property_name_prefix "INTERFACE_")
+  endif ()
+
+  get_target_property (
+    _target_namespace "${i_TARGET}"
+    ${_property_name_prefix}UTK_CMAKE_PROJECT_CXX_NAMESPACE)
 
   _utk_cmake_target_version (
     TARGET  "${_target}"
@@ -499,10 +541,16 @@ function (_utk_cmake_target_git_information)
 	  set (_git_untracked ".with-untracked")
     endif (_git_untracked)
 
+    get_target_property (_target_type "${i_TARGET}" TYPE)
+
+    if (_target_type STREQUAL "INTERFACE_LIBRARY")
+      set (_property_name_prefix "INTERFACE_")
+    endif ()
+
     set_target_properties (${i_TARGET}
 	  PROPERTIES
-	  UTK_CMAKE_GIT_DESCRIBE         "${_git_describe}"
-	  UTK_CMAKE_GIT_UNTRACKED_FILES  "${_git_untracked}")
+	  ${_property_name_prefix}UTK_CMAKE_GIT_DESCRIBE         "${_git_describe}"
+	  ${_property_name_prefix}UTK_CMAKE_GIT_UNTRACKED_FILES  "${_git_untracked}")
   endif (GIT_FOUND)
 endfunction (_utk_cmake_target_git_information)
 
@@ -532,26 +580,39 @@ function (_utk_cmake_target_info_functions)
   cmake_parse_arguments (i
     "${_options}" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
 
+  get_target_property (_target_type "${i_TARGET}" TYPE)
+
+  if (_target_type STREQUAL "INTERFACE_LIBRARY")
+    set (_property_name_prefix "INTERFACE_")
+  endif ()
+
   # Gather target property values
   get_target_property (TARGET_GIT_DESCRIBE
-	${i_TARGET} UTK_CMAKE_GIT_DESCRIBE)
+	${i_TARGET}  ${_property_name_prefix}UTK_CMAKE_GIT_DESCRIBE)
 
   get_target_property (TARGET_GIT_UNTRACKED
-	${i_TARGET} UTK_CMAKE_GIT_UNTRACKED_FILES)
+	${i_TARGET}  ${_property_name_prefix}UTK_CMAKE_GIT_UNTRACKED_FILES)
 
   get_target_property (_target_include_prefix
-	${i_TARGET} UTK_CMAKE_INCLUDE_PREFIX)
+	${i_TARGET}  ${_property_name_prefix}UTK_CMAKE_INCLUDE_PREFIX)
 
   get_target_property (_target_cxx_namespace
-    ${i_TARGET} UTK_CMAKE_PROJECT_CXX_NAMESPACE)
+    ${i_TARGET}  ${_property_name_prefix}UTK_CMAKE_PROJECT_CXX_NAMESPACE)
 
-  get_target_property (TARGET_EXPORT_HEADER
-	${i_TARGET} UTK_CMAKE_EXPORT_HEADER)
+  if (NOT (_target_type STREQUAL "INTERFACE_LIBRARY"))
+    get_target_property (TARGET_EXPORT_HEADER
+	  ${i_TARGET}  UTK_CMAKE_EXPORT_HEADER)
 
-  get_target_property (TARGET_EXPORT_MACRO
-	${i_TARGET} UTK_CMAKE_EXPORT_MACRO)
+    get_target_property (TARGET_EXPORT_MACRO
+	  ${i_TARGET}  UTK_CMAKE_EXPORT_MACRO)
 
-  get_target_property (_target_type ${i_TARGET} TYPE)
+    if (NOT TARGET_EXPORT_HEADER OR
+        NOT TARGET_EXPORT_MACRO)
+      message (SEND_ERROR "UTK_CMAKE_EXPORT_HEADER and/or UTK_CMAKE_EXPORT_MACRO property was not set.")
+
+      return ()
+    endif ()
+  endif ()
 
   _utk_cmake_target_version (
     TARGET  "${_target}"
@@ -574,6 +635,10 @@ function (_utk_cmake_target_info_functions)
     set (${TARGET_IDENTIFIER}_HAS_GIT_INFO true)
   endif ()
 
+  if (TARGET_EXPORT_HEADER AND TARGET_EXPORT_MACRO)
+    set (${TARGET_IDENTIFIER}_HAS_EXPORT_HEADER true)
+  endif ()
+
   utk_cmake_split_version_string (
     VERSION_STRING  "${_target_version}"
     OUTPUT_MAJOR    TARGET_VERSION_MAJOR
@@ -590,6 +655,10 @@ function (_utk_cmake_target_info_functions)
 
     if (_target_language STREQUAL "CXX")
       set (${TARGET_IDENTIFIER}_USE_NAMESPACE true)
+    endif ()
+
+    if (_target_type STREQUAL "INTERFACE_LIBRARY")
+      set (TARGET_FUNCTION_NAME_PREFIX  "inline ")
     endif ()
   else ()
     _utk_cmake_target_function_name_prefix (
@@ -677,14 +746,20 @@ function (_utk_cmake_target_info_functions)
     @ONLY)
 
   # Generate final output files
+  if (_target_type STREQUAL "INTERFACE_LIBRARY")
+    set (_sources_type "INTERFACE")
+  else ()
+    set (_sources_type "PRIVATE")
+  endif ()
+
   configure_file (
 	"${_header_template_stage_1}"
 	"${_declaration_file}")
 
   target_sources ("${i_TARGET}"
-    PRIVATE
+    ${_sources_type}
     $<BUILD_INTERFACE:${_declaration_file}>
-    $<INSTALL_INTERFACE:include/${_target_include_prefix}/${_declaration_file_base_name}>)
+    $<INSTALL_INTERFACE:include/${_target_include_prefix}/${_file_base_name}.h>)
 
   set (_definitions_file "")
 
@@ -711,7 +786,7 @@ function (_utk_cmake_target_info_functions)
   set_target_properties (
     ${_target}
     PROPERTIES
-    UTK_CMAKE_PROJECT_INFO_HEADER ${_declaration_file}
+    ${_property_name_prefix}UTK_CMAKE_PROJECT_INFO_HEADER  "${_declaration_file}"
     )
 
   if (_target_type STREQUAL "INTERFACE_LIBRARY")
@@ -729,7 +804,7 @@ function (_utk_cmake_target_info_functions)
     file (WRITE "${_declaration_file}" "${_declarations}")
   else ()
     target_sources ("${i_TARGET}"
-      PRIVATE
+      ${_sources_type}
       "${_definitions_file}")
   endif ()
 endfunction (_utk_cmake_target_info_functions)
@@ -762,22 +837,32 @@ function (_utk_cmake_target_language)
   endif ()
 
   # Main logic
-  get_target_property (_c_extensions
-	${i_TARGET} C_EXTENSIONS)
-  get_target_property (_c_standard
-	${i_TARGET} C_STANDARD)
-  get_target_property (_cxx_extensions
-	${i_TARGET} CXX_EXTENSIONS)
-  get_target_property (_cxx_standard
-	${i_TARGET} CXX_STANDARD)
-  get_target_property (_linker_language
-	${i_TARGET} LINKER_LANGUAGE)
+  if (_target_type STREQUAL "INTERFACE_LIBRARY")
+    get_target_property (_target_language_property
+	  ${i_TARGET}  INTERFACE_UTK_CMAKE_LANGUAGE)
+  else ()
+    get_target_property (_target_language_property
+	  ${i_TARGET}  UTK_CMAKE_LANGUAGE)
+
+    get_target_property (_c_extensions
+	  ${i_TARGET}  C_EXTENSIONS)
+    get_target_property (_c_standard
+	  ${i_TARGET}  C_STANDARD)
+    get_target_property (_cxx_extensions
+	  ${i_TARGET}  CXX_EXTENSIONS)
+    get_target_property (_cxx_standard
+	  ${i_TARGET}  CXX_STANDARD)
+    get_target_property (_linker_language
+	  ${i_TARGET}  LINKER_LANGUAGE)
+  endif ()
 
   get_property(_enabled_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
 
   set (_target_language "UNDEFINED")
 
-  if (_linker_language)
+  if (_target_language_property)
+    set (_target_language "${_target_language_property}")
+  elseif (_linker_language)
     set (_target_language ${_linker_language})
   else ()
     if (_c_extensions OR _c_standard OR ("C" IN_LIST _enabled_languages))
@@ -820,7 +905,11 @@ function (_utk_cmake_target_version)
   endif ()
 
   # Main logic
-  get_target_property (_target_version ${i_TARGET} VERSION)
+  get_target_property (_target_type "${i_TARGET}" TYPE)
+
+  if (NOT (_target_type STREQUAL "INTERFACE_LIBRARY"))
+    get_target_property (_target_version ${i_TARGET} VERSION)
+  endif ()
 
   if (NOT _target_version)
     set (_target_version ${${PROJECT_NAME}_VERSION})
