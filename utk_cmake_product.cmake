@@ -42,6 +42,11 @@ define_property (TARGET
   ignored files in repository.")
 
 define_property (TARGET
+  PROPERTY UTK_CMAKE_LANGUAGE
+  BRIEF_DOCS "The main target programming language"
+  FULL_DOCS "This property is used to generate version information functions in the way that suits the language best.")
+
+define_property (TARGET
   PROPERTY UTK_CMAKE_PROJECT_CXX_NAMESPACE
   BRIEF_DOCS "A list that represents hierarchy of the main project namespace"
   FULL_DOCS "Each item in the list represents a namespace that is nested inside the namespace, named by the previous list item. If the item value is \"inline\" then the next item represents the namespace with the \"inline\" attribute.")
