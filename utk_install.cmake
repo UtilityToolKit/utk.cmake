@@ -147,11 +147,22 @@ function (utk_cmake_install_project)
 
     get_target_property (_target_export_name  "${_target}" EXPORT_NAME)
     get_target_property (_target_type         "${_target}" TYPE)
-    get_target_property (_target_version      "${_target}" VERSION)
 
-    get_target_property (_target_is_bundle         "${_target}" BUNDLE)
-    get_target_property (_target_is_framework      "${_target}" FRAMEWORK)
-    get_target_property (_target_is_macosx_bundle  "${_target}" MACOSX_BUNDLE)
+
+    # Some properties are not supported for INTERFACE_LIBRARY targets.
+    if (_target_type STREQUAL "INTERFACE_LIBRARY")
+      set (_target_version ${${PROJECT_NAME}_VERSION})
+
+      if (NOT _target_version)
+        message (SEND_ERROR "Provide ${PROJECT_NAME}_VERSION to make installation of the \"${_target}\" INTERFACE_LIBRARY possible.")
+      endif ()
+    else ()
+      get_target_property (_target_is_bundle         "${_target}" BUNDLE)
+      get_target_property (_target_is_framework      "${_target}" FRAMEWORK)
+      get_target_property (_target_is_macosx_bundle  "${_target}" MACOSX_BUNDLE)
+
+      get_target_property (_target_version      "${_target}" VERSION)
+    endif ()
 
     if (_target_export_name)
       set (_export_options EXPORT "${_target_export_name}")
@@ -394,7 +405,14 @@ function (_utk_cmake_target_sources_to_install)
   set (_source_extract_regex
     "(\\$<BUILD_INTERFACE:([^>;<$]+)>;\\$<INSTALL_INTERFACE:([^>;<$]+)>)")
 
-  get_target_property (_target_sources ${i_TARGET} SOURCES)
+  get_target_property (_target_type  "${_target}" TYPE)
+
+  # SOURCES property is not supported for INTERFACE_LIBRARY targets
+  if (_target_type STREQUAL "INTERFACE_LIBRARY")
+    get_target_property (_target_sources ${i_TARGET} INTERFACE_SOURCES)
+  else ()
+    get_target_property (_target_sources ${i_TARGET} SOURCES)
+  endif ()
 
   if (_target_sources)
     string (REGEX MATCHALL
