@@ -720,7 +720,7 @@ function (_utk_cmake_target_info_functions)
   target_sources ("${i_TARGET}"
     PRIVATE
     $<BUILD_INTERFACE:${_declaration_file}>
-    $<INSTALL_INTERFACE:include/${_target_include_prefix}/${_declaration_file_base_name}>)
+    $<INSTALL_INTERFACE:include/${_target_include_prefix}/${_file_base_name}.h>)
 
   set (_definitions_file "")
 
