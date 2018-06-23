@@ -119,20 +119,22 @@ function (utk_cmake_find_or_download_package)
       endif ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
     endforeach (_overridable_option IN LISTS i_DOWNLOAD_OPTIONS_WITH_OVERRIDE)
 
-    if (CMAKE_VERSION VERSION_LESS 3.2)
-      set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-    else()
-      set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-    endif()
+    if (NOT TARGET "${i_DOWNLOADED_TARGET}")
+      if (CMAKE_VERSION VERSION_LESS 3.2)
+        set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+      else()
+        set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+      endif()
 
-    download_project (
-      PROJ                ${i_PACKAGE}
-      ${i_DOWNLOAD_OPTIONS}
-      ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+      download_project (
+        PROJ                ${i_PACKAGE}
+        ${i_DOWNLOAD_OPTIONS}
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE})
 
-    add_subdirectory (
-      ${${i_PACKAGE}_SOURCE_DIR}
-      ${${i_PACKAGE}_BINARY_DIR})
+      add_subdirectory (
+        ${${i_PACKAGE}_SOURCE_DIR}
+        ${${i_PACKAGE}_BINARY_DIR})
+    endif ()
   else ()
     find_package (${i_PACKAGE} ${i_FIND_PACKAGE_OPTIONS})
 
@@ -149,6 +151,99 @@ function (utk_cmake_find_or_download_package)
 
   set (${i_IMPORTED_TARGET} ${_imported_target} PARENT_SCOPE)
 endfunction (utk_cmake_find_or_download_package)
+
+
+function (utk_cmake_download_and_use_googletest)
+  set (_options
+    ""
+    )
+  set (_one_value_args
+    OUTPUT_ADDITIONAL_TARGET_PROPERTIES
+    )
+  set (_multi_value_args
+    ""
+    )
+
+  cmake_parse_arguments (i
+    "${_options}" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
+
+  set (OLD_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+  set (OLD_BUILD_STATIC_LIBS ${BUILD_STATIC_LIBS})
+
+  # Google Test should be built in static library to prevent linking problems
+  set (BUILD_SHARED_LIBS OFF)
+  set (BUILD_STATIC_LIBS ON)
+
+  utk_cmake_find_or_download_package (
+    PACKAGE               googletest
+    DOWNLOAD_AND_BUILD_BY_DEFAULT
+    DOWNLOADED_TARGET     "gtest"
+    IMPORTED_TARGET       googletest_target
+    FIND_PACKAGE_TARGET   "gtest"
+    FIND_PACKAGE_OPTIONS  ""
+    DOWNLOAD_OPTIONS
+    GIT_TAG               origin/master
+    GIT_REPOSITORY        https://github.com/google/googletest.git
+    DOWNLOAD_OPTIONS_WITH_OVERRIDE
+    GIT_TAG
+    GIT_REPOSITORY
+    )
+
+  set (_targets_to_set_properties
+    gmock
+    gmock_main
+    gtest
+    gtest_main
+    )
+
+  # Building with CLang on MSVS 2017 gives a lot of warnings for deprecated and
+  # non-portable functions. Disable those warnings with the preprocessor
+  # definitions.
+  set (_additional_target_properties
+    "COMPILE_DEFINITIONS\;_CRT_SECURE_NO_WARNINGS\\\;_CRT_NONSTDC_NO_WARNINGS"
+    )
+
+  foreach (_target IN LISTS _targets_to_set_properties)
+    if (TARGET ${_target})
+      if (PROJECT_FOLDER)
+        set_property (
+          TARGET ${_target}
+          PROPERTY FOLDER
+          "${PROJECT_FOLDER}/Tests/Google Test"
+          )
+      endif ()
+
+      foreach (_additional_property IN LISTS _additional_target_properties)
+        set_property (
+          TARGET ${_target}
+          APPEND PROPERTY
+          ${_additional_property}
+          )
+      endforeach ()
+    endif ()
+  endforeach ()
+
+  # Prevent GoogleTest from overriding our compiler/linker options
+  # when building with Visual Studio.
+  set (gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+  # Disable GoogleTest installation by default.
+  set (INSTALL_GMOCK OFF CACHE BOOL "" FORCE)
+  set (INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+
+  # Restore BUILD_SHARED_LIBS and BUILD_STATIC_LIBS. Maybe not needed, but this
+  # way it is a bit safer.
+  set (BUILD_SHARED_LIBS ${OLD_BUILD_SHARED_LIBS})
+  set (BUILD_STATIC_LIBS ${OLD_BUILD_STATIC_LIBS})
+
+  # Return additional target properties that are required to use Google Test.
+  if (i_OUTPUT_ADDITIONAL_TARGET_PROPERTIES)
+    set (
+      ${i_OUTPUT_ADDITIONAL_TARGET_PROPERTIES}
+      "${_additional_target_properties}" PARENT_SCOPE)
+  endif ()
+endfunction (utk_cmake_download_and_use_googletest)
+
 
 
 ######################
