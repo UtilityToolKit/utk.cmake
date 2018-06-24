@@ -203,6 +203,14 @@ function (utk_cmake_download_and_use_googletest)
     "COMPILE_DEFINITIONS\;_CRT_SECURE_NO_WARNINGS\\\;_CRT_NONSTDC_NO_WARNINGS"
     )
 
+  # Building with CLang may result in warnings about unused command line
+  # options. Disable this kind of warnings with -Qunused-arguments command line
+  # option.
+  if (MSVC AND ("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang"))
+    set (_additional_target_properties
+      "${_additional_target_properties};COMPILE_OPTIONS\;-Qunused-arguments")
+  endif ()
+
   foreach (_target IN LISTS _targets_to_set_properties)
     if (TARGET ${_target})
       if (PROJECT_FOLDER)
