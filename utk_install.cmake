@@ -244,6 +244,9 @@ function (utk_cmake_install_project)
       # Prepare variables with file names
       string (TOLOWER "${_target}" TARGET_CMAKE_CONFIG_BASE_NAME)
 
+      set (TARGET_CMAKE_CONFIG_TARGETS_FILE_NAME
+        "${TARGET_CMAKE_CONFIG_BASE_NAME}-config-targets.cmake")
+
       set (_target_config_file_name
         "${TARGET_CMAKE_CONFIG_BASE_NAME}-config.cmake")
       set (_target_config_targets_file_name
