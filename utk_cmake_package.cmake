@@ -153,6 +153,18 @@ function (utk_cmake_find_or_download_package)
 endfunction (utk_cmake_find_or_download_package)
 
 
+# @function utk_cmake_download_and_use_googletest
+#
+# @brief Convinience function for downloading Google Test framework
+#
+# @details Downloads the Google Test framework by default, sets it up to build
+#          as a static library, sets up warning options when needed and resets
+#          INSTALL_* options for Google Test and Google Mock.
+#
+# @param [in] OUTPUT_ADDITIONAL_TARGET_PROPERTIES - the name of the variable in
+#             the parent scope to store additional properties which include
+#             target link libraries to use Google test framework to build the
+#             targets that use it.
 function (utk_cmake_download_and_use_googletest)
   set (_options
     ""
