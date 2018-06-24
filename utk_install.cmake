@@ -244,14 +244,21 @@ function (utk_cmake_install_project)
       # Prepare variables with file names
       string (TOLOWER "${_target}" TARGET_CMAKE_CONFIG_BASE_NAME)
 
+      set (_target_config_file_name
+        "${TARGET_CMAKE_CONFIG_BASE_NAME}-config.cmake")
+      set (_target_config_targets_file_name
+        "${TARGET_CMAKE_CONFIG_TARGETS_FILE_NAME}")
+      set (_target_config_version_file_name
+        "${TARGET_CMAKE_CONFIG_BASE_NAME}-config-version.cmake")
+
       set (_target_config_file
-        "${CMAKE_CURRENT_BINARY_DIR}/${_target}/${TARGET_CMAKE_CONFIG_BASE_NAME}-config.cmake")
+        "${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target_config_file_name}")
 
       set (_target_config_targets_file
-        "${CMAKE_CURRENT_BINARY_DIR}/${_target}/${TARGET_CMAKE_CONFIG_BASE_NAME}-config-targets.cmake")
+        "${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target_config_targets_file_name}")
 
       set (_target_config_version_file
-        "${CMAKE_CURRENT_BINARY_DIR}/${_target}/${TARGET_CMAKE_CONFIG_BASE_NAME}-config-version.cmake")
+        "${CMAKE_CURRENT_BINARY_DIR}/${_target}/${_target_config_version_file_name}")
 
       # Generate package *-config-version.cmake
       if (i_CUSTOM_CMAKE_CONFIG_VERSION_FILE)
@@ -302,7 +309,7 @@ function (utk_cmake_install_project)
       install(
         ${_export_options}
         FILE
-        "${TARGET_CMAKE_CONFIG_BASE_NAME}-targets.cmake"
+        "${_target_config_targets_file_name}"
         ${_cmake_package_file_options}
         )
 
