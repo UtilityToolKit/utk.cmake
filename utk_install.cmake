@@ -324,6 +324,14 @@ function (utk_cmake_install_project)
         ${_cmake_package_file_options}
         )
 
+      # Export target to enable using the target from the build tree
+      export (${_export_options}
+        FILE "${_target_config_targets_file}"
+        )
+
+      # Export package to CMake package registry
+      export (PACKAGE ${_target})
+
       # set (UTK_PC_IN_CONFIGURE_PROJECT_VERSION ${${PROJECT_NAME}_VERSION})
       # configure_file(
       #   "${UTK_CMAKE_INSTALL_MODULE_DIR}/utk_cmake_install/pkg-config.pc.in"
