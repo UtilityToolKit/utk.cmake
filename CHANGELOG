@@ -1,3 +1,21 @@
+Version 0.4.0 (2018-06-24)
+
+    New features:
+    * Introduced a new variable for *-config-targets.cmake file
+      configuration
+
+    * Implemented export of the target and package for use from
+      build-tree
+
+    * Improved handling of warnings with MSVS LLVM toolchain while
+      building Google Test
+
+    * Rename utk_install.cmake -> utk_cmake_install.cmake
+
+    Fixed problems:
+
+    * Documented the utk_cmake_download_and_use_googletest() function.
+
 Version 0.3.0 (2018-06-23)
 
     New features:
