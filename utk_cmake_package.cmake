@@ -150,11 +150,12 @@ function (utk_cmake_find_or_download_package)
 
   get_target_property (_imported_target_type  "${_imported_target}"  TYPE)
 
-  if (i_FOLDER)
+  if (i_FOLDER AND
+      NOT (_imported_target_type STREQUAL "INTERFACE_LIBRARY"))
     set_target_properties (
       ${_imported_target}
       PROPERTIES
-      FOLDER ${i_FOLDER}
+      FOLDER  "${i_FOLDER}"
       )
   endif ()
 
