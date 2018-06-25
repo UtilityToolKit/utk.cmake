@@ -98,6 +98,16 @@ function (utk_cmake_find_or_download_package)
     ${i_DOWNLOAD_AND_BUILD_BY_DEFAULT}
     )
 
+  if (NOT (CMAKE_VERSION VERSION_LESS 3.2))
+    set (_force_update_docstring
+      "Enforce update of the \"${i_PACKAGE}\" downloaded project during the next configuration")
+
+    option (DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE
+      "${_force_update_docstring}"
+      true
+      )
+  endif()
+
   if (NOT DEFINED i_DOWNLOADED_TARGET)
     set (i_DOWNLOADED_TARGET ${i_PACKAGE})
   endif(NOT DEFINED i_DOWNLOADED_TARGET)
@@ -130,7 +140,13 @@ function (utk_cmake_find_or_download_package)
       if (CMAKE_VERSION VERSION_LESS 3.2)
         set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
       else()
-        set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+        if (NOT ${DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE})
+          set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+        else ()
+          set (
+            DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE false
+            CACHE BOOL "${_force_update_docstring}" FORCE)
+        endif ()
       endif()
 
       download_project (
