@@ -100,12 +100,23 @@ function (utk_cmake_find_or_download_package)
 
   if (NOT (CMAKE_VERSION VERSION_LESS 3.2))
     set (_force_update_docstring
-      "Enforce update of the \"${i_PACKAGE}\" downloaded project during the next configuration")
+      "Enforce update of the \"${i_PACKAGE}\" downloaded project during the next configuration (overrides DOWNLOADANDBUILD_${i_PACKAGE}_SKIP_UPDATE)")
+
+    set (_skip_update_docstring
+      "Skip update of the \"${i_PACKAGE}\" downloaded project during the configuration")
 
     option (DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE
       "${_force_update_docstring}"
       true
       )
+
+    option (DOWNLOADANDBUILD_${i_PACKAGE}_SKIP_UPDATE
+      "${_skip_update_docstring}"
+      TRUE
+      )
+
+    string (MAKE_C_IDENTIFIER
+      "utk_cmake_find_or_download_package_${i_PACKAGE}_${i_DOWNLOAD_OPTIONS}"  _package_id)
   endif()
 
   if (NOT DEFINED i_DOWNLOADED_TARGET)
@@ -138,25 +149,47 @@ function (utk_cmake_find_or_download_package)
 
     if (NOT TARGET "${i_DOWNLOADED_TARGET}")
       if (CMAKE_VERSION VERSION_LESS 3.2)
-        set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+        set (UPDATE_DISCONNECTED_IF_AVAILABLE "")
+
+        set (_skip_update FALSE)
       else()
-        if (NOT ${DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE})
-          set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-        else ()
+        if (${DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE})
           set (
             DOWNLOADANDBUILD_${i_PACKAGE}_FORCE_UPDATE false
             CACHE BOOL "${_force_update_docstring}" FORCE)
+
+          set (_skip_update FALSE)
+        else ()
+          set (UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+
+          if ((${_package_id}_SOURCE_DIR AND
+                EXISTS "${${_package_id}_SOURCE_DIR}") AND
+              (${_package_id}_BINARY_DIR AND
+                EXISTS "${${_package_id}_BINARY_DIR}"))
+            set (_skip_update  ${DOWNLOADANDBUILD_${i_PACKAGE}_SKIP_UPDATE})
+          else ()
+            set (_skip_update  FALSE)
+          endif ()
         endif ()
       endif()
 
-      download_project (
-        PROJ                ${i_PACKAGE}
-        ${i_DOWNLOAD_OPTIONS}
-        ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+      if (NOT _skip_update)
+        download_project (
+          PROJ                ${i_PACKAGE}
+          ${i_DOWNLOAD_OPTIONS}
+          ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+
+        set (${_package_id}_SOURCE_DIR  "${${i_PACKAGE}_SOURCE_DIR}"
+          CACHE  INTERNAL  "" FORCE
+          )
+        set (${_package_id}_BINARY_DIR  "${${i_PACKAGE}_BINARY_DIR}"
+          CACHE  INTERNAL  "" FORCE
+          )
+      endif ()
 
       add_subdirectory (
-        ${${i_PACKAGE}_SOURCE_DIR}
-        ${${i_PACKAGE}_BINARY_DIR})
+        ${${_package_id}_SOURCE_DIR}
+        ${${_package_id}_BINARY_DIR})
     endif ()
   else ()
     find_package (${i_PACKAGE} ${i_FIND_PACKAGE_OPTIONS})
