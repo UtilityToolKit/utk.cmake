@@ -17,6 +17,13 @@
 
 cmake_minimum_required (VERSION 3.3)
 
+if (NOT (CMAKE_VERSION VERSION_LESS 3.12))
+  # The CMP0073 policy introduced in CMake 3.12 disables generation of <target
+  # name>_LIB_DEPENDS variables when set to NEW. These variables are harmless
+  # except for the INTERFACE_LIBRARY target case.
+  cmake_policy (CMP0073 NEW)
+endif ()
+
 set (UTK_CMAKE_PACKAGE_MODULE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 include (${UTK_CMAKE_PACKAGE_MODULE_DIRECTORY}/utk_cmake_list.cmake)
@@ -141,12 +148,22 @@ function (utk_cmake_find_or_download_package)
     set (_imported_target ${i_FIND_PACKAGE_TARGET})
   endif ()
 
+  get_target_property (_imported_target_type  "${_imported_target}"  TYPE)
+
   if (i_FOLDER)
     set_target_properties (
       ${_imported_target}
       PROPERTIES
       FOLDER ${i_FOLDER}
       )
+  endif ()
+
+  if (_imported_target_type STREQUAL "INTERFACE_LIBRARY")
+    # A workaround for deprecated variables that are generated for the
+    # downloaded INTERFACE_LIBRARY targets while they are not needed
+    # (https://gitlab.kitware.com/cmake/cmake/issues/16364).
+    unset ("${i_PACKAGE}_LIB_DEPENDS"  CACHE)
+    unset ("${_imported_target}_LIB_DEPENDS"  CACHE)
   endif ()
 
   set (${i_IMPORTED_TARGET} ${_imported_target} PARENT_SCOPE)
