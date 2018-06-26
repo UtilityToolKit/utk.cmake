@@ -1,3 +1,39 @@
 @PACKAGE_INIT@
 
-include("${CMAKE_CURRENT_LIST_DIR}/@TARGET_CMAKE_CONFIG_TARGETS_FILE_NAME@")
+# If the the project name is the same that of the project where the target was
+# initially created and the *-config-targets.cmake file does not exist then we
+# are building the project and its tests, examples, etc. and running the
+# configure for the first time. The *-config-targets.cmake file will only be
+# generated during generate stage of project configuration, so we cannot use it.
+# In this case, we add alias target to enable seamless use of the target
+# (@TARGET_EXPORT_NAME@ target is normally imported by the find_package() function) by
+# dependent @PROJECT_NAME@ subprojects.
+if (("${CMAKE_PROJECT_NAME}" STREQUAL "@PROJECT_NAME@") AND
+    NOT (EXISTS "${CMAKE_CURRENT_LIST_DIR}/@TARGET_CMAKE_CONFIG_TARGETS_FILE_NAME@"))
+  add_library (@TARGET_EXPORT_NAME@ ALIAS @TARGET_NAME@)
+else ()
+  include("${CMAKE_CURRENT_LIST_DIR}/@TARGET_CMAKE_CONFIG_TARGETS_FILE_NAME@")
+endif ()
+
+
+#####################
+# Find dependencies #
+#####################
+include (CMakeFindDependencyMacro)
+
+
+@FIND_TARGET_DEPENDENCIES@
+
+
+####################
+# Use dependancies #
+####################
+# If the the project name is the same that of the project where the target was
+# initially created then the package was found by the find_package()
+# function. Otherwise we are building @PROJECT_NAME@ and its tests, examples,
+# etc. right now.
+if ("${CMAKE_PROJECT_NAME}" STREQUAL "@PROJECT_NAME@")
+  @TARGET_APPLY_DEPENDENCIES_TO_THE_CURRENT_DIRECTORY@
+else ()
+  @TARGET_APPLY_IMPORTED_TARGET_DEPENDENCIES@
+endif ()
