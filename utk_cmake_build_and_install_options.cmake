@@ -54,6 +54,7 @@
 function (utk_cmake_build_and_install_options)
   set (_options
     EXECUTABLE
+    INSTALL_DEVEL
     MODULE_LIBRARY
     SHARED_LIBRARY
     SHARED_LIBRARY_ENABLED
@@ -93,7 +94,7 @@ function (utk_cmake_build_and_install_options)
     set (${i_OPTION_PREFIX}_INSTALL_RUNTIME false PARENT_SCOPE)
   endif ()
 
-  if (i_SHARED_LIBRARY OR i_STATIC_LIBRARY)
+  if (i_SHARED_LIBRARY OR i_STATIC_LIBRARY OR i_INSTALL_DEVEL)
     option (${i_OPTION_PREFIX}_INSTALL_DEVEL "Install development files (headers, libraries, CMake and pkg-config package files)" true)
   else ()
     set (${i_OPTION_PREFIX}_INSTALL_DEVEL false PARENT_SCOPE)
