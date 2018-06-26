@@ -143,11 +143,17 @@ function (utk_cmake_install_project)
       _utk_cmake_install_target_sources (TARGET ${_target})
     endif ()
 
-    set (TARGET_NAME "${_target}")
-
     get_target_property (_target_export_name  "${_target}" EXPORT_NAME)
     get_target_property (_target_type         "${_target}" TYPE)
 
+    if (NOT _target_export_name)
+      set (_target_export_name  "${_target}")
+    endif ()
+
+    set (TARGET_NAME "${_target}")
+    set (TARGET_EXPORT_NAME "${_target_export_name}")
+
+    set (_export_options EXPORT "${_target_export_name}")
 
     # Some properties are not supported for INTERFACE_LIBRARY targets.
     if (_target_type STREQUAL "INTERFACE_LIBRARY")
@@ -162,12 +168,6 @@ function (utk_cmake_install_project)
       get_target_property (_target_is_macosx_bundle  "${_target}" MACOSX_BUNDLE)
 
       get_target_property (_target_version      "${_target}" VERSION)
-    endif ()
-
-    if (_target_export_name)
-      set (_export_options EXPORT "${_target_export_name}")
-    else ()
-      set (_export_options EXPORT "${_target}")
     endif ()
 
     # Install runtime files
