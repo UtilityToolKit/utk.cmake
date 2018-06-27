@@ -6,8 +6,8 @@
 # configure for the first time. The *-config-targets.cmake file will only be
 # generated during generate stage of project configuration, so we cannot use it.
 # In this case, we add alias target to enable seamless use of the target
-# (@TARGET_EXPORT_NAME@ target is normally imported by the find_package() function) by
-# dependent @PROJECT_NAME@ subprojects.
+# (@TARGET_EXPORT_NAME@ target is normally imported by the find_package()
+# function) by dependent @PROJECT_NAME@ subprojects.
 if (("${CMAKE_PROJECT_NAME}" STREQUAL "@PROJECT_NAME@") AND
     NOT (EXISTS "${CMAKE_CURRENT_LIST_DIR}/@TARGET_CMAKE_CONFIG_TARGETS_FILE_NAME@"))
   add_library (@TARGET_EXPORT_NAME@ ALIAS @TARGET_NAME@)
@@ -26,7 +26,7 @@ include (CMakeFindDependencyMacro)
 
 
 ####################
-# Use dependancies #
+# Use dependencies #
 ####################
 # If the the project name is the same that of the project where the target was
 # initially created then the package was found by the find_package()
