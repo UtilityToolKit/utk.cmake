@@ -733,7 +733,8 @@ function (_utk_cmake_target_info_functions)
   set (_source_template_stage_1
     "${PROJECT_BINARY_DIR}/${_file_base_name}.c.in")
 
-  set (_declaration_file "${PROJECT_BINARY_DIR}/${_file_base_name}.h")
+  set (_declaration_file
+    "${PROJECT_BINARY_DIR}/include/${_target_include_prefix}/${_file_base_name}.h")
 
   configure_file (
 	"${_header_file_template}"
@@ -765,13 +766,15 @@ function (_utk_cmake_target_info_functions)
 
   if (("C" STREQUAL _target_language) OR
       ("UNDEFINED" STREQUAL _target_language))
-    set (_definitions_file "${PROJECT_BINARY_DIR}/${TARGET_IDENTIFIER}_version.c")
+    set (_definitions_file
+      "${PROJECT_BINARY_DIR}/include/${_target_include_prefix}/${_file_base_name}.c")
 
     configure_file(
       "${_source_template_stage_1}"
       "${_definitions_file}")
   elseif ("CXX" STREQUAL _target_language)
-    set (_definitions_file "${PROJECT_BINARY_DIR}/${TARGET_IDENTIFIER}_version.cpp")
+    set (_definitions_file
+      "${PROJECT_BINARY_DIR}/include/${_target_include_prefix}/${_file_base_name}.cpp")
 
     configure_file(
       "${_source_template_stage_1}"
