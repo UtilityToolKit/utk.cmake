@@ -1,3 +1,27 @@
+Version 0.5.0 (2018-06-28)
+
+    New features:
+
+    * Improved handling of the INTERFACE_LIBRARY targets in respect to setting
+      FOLDER property.
+
+    * Introduced an option for enforcing the update of the downloaded
+      dependency.
+
+    * Introduced an option for skipping downloaded package update.
+
+    * Introdused an option to control development files installation.
+
+    * Implemented a framework for dependency handling in *-target-config.cmake.
+
+
+    Fixed problems:
+
+    * Workaround for https://gitlab.kitware.com/cmake/cmake/issues/16364.
+
+    * Fix formatting and typos.
+
+
 Version 0.4.0 (2018-06-24)
 
     New features:
