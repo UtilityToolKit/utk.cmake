@@ -493,10 +493,6 @@ function (_utk_cmake_target_function_name_prefix)
     else ()
       string (MAKE_C_IDENTIFIER "${_prefix_base}" _target_function_name_prefix)
     endif ()
-
-    if (_target_type STREQUAL "INTERFACE_LIBRARY")
-      set (_target_function_name_prefix "inline ${_target_function_name_prefix}")
-    endif ()
   else ()
     message (SEND_ERROR "Unsupported language \"${_target_language}\"")
 
@@ -656,10 +652,6 @@ function (_utk_cmake_target_info_functions)
     if (_target_language STREQUAL "CXX")
       set (${TARGET_IDENTIFIER}_USE_NAMESPACE true)
     endif ()
-
-    if (_target_type STREQUAL "INTERFACE_LIBRARY")
-      set (TARGET_FUNCTION_NAME_PREFIX  "inline ")
-    endif ()
   else ()
     _utk_cmake_target_function_name_prefix (
       TARGET                    ${i_TARGET}
@@ -670,6 +662,10 @@ function (_utk_cmake_target_info_functions)
 
   if (NOT (_target_type STREQUAL "INTERFACE_LIBRARY"))
     set (${TARGET_IDENTIFIER}_SEPARATE_INFO_FUNCTIONS_DEFINITIONS true)
+  endif ()
+
+  if (_target_type STREQUAL "INTERFACE_LIBRARY")
+    set (INLINE_FUNCTION_SPECIFIER "inline")
   endif ()
 
   set (${TARGET_IDENTIFIER}_LANG_IS_${_target_language} true)
