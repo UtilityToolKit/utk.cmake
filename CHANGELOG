@@ -1,3 +1,10 @@
+Version 0.6.0 (2018-06-28)
+
+    New features:
+
+    * Introduced an option for controlling benchmarks building and installing.
+
+
 Version 0.5.1 (2018-06-29)
 
     Fixed problems:
