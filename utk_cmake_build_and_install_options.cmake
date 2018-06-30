@@ -53,6 +53,8 @@
 #                             is not provided then the ${PROJECT_NAME} is used.
 function (utk_cmake_build_and_install_options)
   set (_options
+    BENCHMARKS
+    BENCHMARKS_ENABLED
     EXECUTABLE
     INSTALL_DEVEL
     MODULE_LIBRARY
@@ -82,7 +84,8 @@ function (utk_cmake_build_and_install_options)
         i_MODULE_LIBRARY OR
         i_SHARED_LIBRARY OR
         i_STATIC_LIBRARY OR
-        i_TESTS))
+        i_TESTS OR
+        i_BENCHMARKS))
     message (SEND_ERROR "No options provided")
 
     return ()
@@ -122,6 +125,13 @@ function (utk_cmake_build_and_install_options)
     option (${i_OPTION_PREFIX}_BUILD_TESTS
       "Build tests" ${i_TESTS_ENABLED})
     option (${i_OPTION_PREFIX}_INSTALL_TESTS
+      "Install tests with other executables" false)
+  endif ()
+
+  if (i_BENCHMARKS)
+    option (${i_OPTION_PREFIX}_BUILD_BENCHMARKS
+      "Build tests" ${i_BENCHMARKS_ENABLED})
+    option (${i_OPTION_PREFIX}_INSTALL_BENCHMARKS
       "Install tests with other executables" false)
   endif ()
 endfunction (utk_cmake_build_and_install_options)
