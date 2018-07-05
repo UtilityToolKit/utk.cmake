@@ -181,7 +181,8 @@ function (utk_cmake_add_library_targets)
       )
   endif ()
 
-  if (${i_OPTION_PREFIX}_SECONDARY_TARGET_NAME)
+  if (${i_OPTION_PREFIX}_SECONDARY_TARGET_NAME AND
+      (i_BUILD_SHARED_LIBRARY AND i_BUILD_STATIC_LIBRARY))
     add_library (
       ${${i_OPTION_PREFIX}_SECONDARY_TARGET_NAME}
       ${${i_OPTION_PREFIX}_SECONDARY_TARGET_TYPE}
@@ -200,9 +201,14 @@ function (utk_cmake_add_library_targets)
     endif ()
   endif ()
 
-  set (${i_OPTION_PREFIX}_TARGET_LIST
-    "${${i_OPTION_PREFIX}_TARGET_NAME}"
-    "${${i_OPTION_PREFIX}_SECONDARY_TARGET_NAME}" PARENT_SCOPE)
+  if (i_BUILD_SHARED_LIBRARY AND i_BUILD_STATIC_LIBRARY)
+    set (${i_OPTION_PREFIX}_TARGET_LIST
+      "${${i_OPTION_PREFIX}_TARGET_NAME}"
+      "${${i_OPTION_PREFIX}_SECONDARY_TARGET_NAME}" PARENT_SCOPE)
+  else ()
+    set (${i_OPTION_PREFIX}_TARGET_LIST
+      "${${i_OPTION_PREFIX}_TARGET_NAME}" PARENT_SCOPE)
+  endif ()
 endfunction (utk_cmake_add_library_targets)
 
 
