@@ -114,9 +114,6 @@ function (utk_cmake_find_or_download_package)
       "${_skip_update_docstring}"
       TRUE
       )
-
-    string (MAKE_C_IDENTIFIER
-      "utk_cmake_find_or_download_package_${i_PACKAGE}_${i_DOWNLOAD_OPTIONS}"  _package_id)
   endif()
 
   if (NOT DEFINED i_DOWNLOADED_TARGET)
@@ -147,6 +144,18 @@ function (utk_cmake_find_or_download_package)
       endif ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
     endforeach (_overridable_option IN LISTS i_DOWNLOAD_OPTIONS_WITH_OVERRIDE)
 
+    # Package info variables
+    string (MAKE_C_IDENTIFIER
+      "utk_cmake_find_or_download_package_${i_PACKAGE}_${i_DOWNLOAD_OPTIONS}"
+      _package_info_var_id)
+
+    string (MD5
+      _package_id
+      "${i_DOWNLOAD_OPTIONS}"
+      )
+
+    set (_package_prefix  "${CMAKE_BINARY_DIR}/${i_PACKAGE}/${_package_id}")
+
     if (NOT TARGET "${i_DOWNLOADED_TARGET}")
       if (CMAKE_VERSION VERSION_LESS 3.2)
         set (UPDATE_DISCONNECTED_IF_AVAILABLE "")
@@ -162,10 +171,10 @@ function (utk_cmake_find_or_download_package)
         else ()
           set (UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
 
-          if ((${_package_id}_SOURCE_DIR AND
-                EXISTS "${${_package_id}_SOURCE_DIR}") AND
-              (${_package_id}_BINARY_DIR AND
-                EXISTS "${${_package_id}_BINARY_DIR}"))
+          if ((${_package_info_var_id}_SOURCE_DIR AND
+                EXISTS "${${_package_info_var_id}_SOURCE_DIR}") AND
+              (${_package_info_var_id}_BINARY_DIR AND
+                EXISTS "${${_package_info_var_id}_BINARY_DIR}"))
             set (_skip_update  ${DOWNLOADANDBUILD_${i_PACKAGE}_SKIP_UPDATE})
           else ()
             set (_skip_update  FALSE)
@@ -176,20 +185,22 @@ function (utk_cmake_find_or_download_package)
       if (NOT _skip_update)
         download_project (
           PROJ                ${i_PACKAGE}
+          PREFIX              ${_package_prefix}
           ${i_DOWNLOAD_OPTIONS}
-          ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+          ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+          )
 
-        set (${_package_id}_SOURCE_DIR  "${${i_PACKAGE}_SOURCE_DIR}"
+        set (${_package_info_var_id}_SOURCE_DIR  "${${i_PACKAGE}_SOURCE_DIR}"
           CACHE  INTERNAL  "" FORCE
           )
-        set (${_package_id}_BINARY_DIR  "${${i_PACKAGE}_BINARY_DIR}"
+        set (${_package_info_var_id}_BINARY_DIR  "${${i_PACKAGE}_BINARY_DIR}"
           CACHE  INTERNAL  "" FORCE
           )
       endif ()
 
       add_subdirectory (
-        ${${_package_id}_SOURCE_DIR}
-        ${${_package_id}_BINARY_DIR})
+        ${${_package_info_var_id}_SOURCE_DIR}
+        ${${_package_info_var_id}_BINARY_DIR})
     endif ()
   else ()
     find_package (${i_PACKAGE} ${i_FIND_PACKAGE_OPTIONS})
