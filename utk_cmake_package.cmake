@@ -135,10 +135,10 @@ function (utk_cmake_find_or_download_package)
     foreach (_overridable_option IN LISTS i_DOWNLOAD_OPTIONS_WITH_OVERRIDE)
       if ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
         _utk_cmake_download_option_override (
-          PACKAGE "${i_PACKAGE}"
-          OPTION_NAME "${_overridable_option}"
-          OPTION_LIST ${i_DOWNLOAD_OPTIONS}
-          OUTPUT i_DOWNLOAD_OPTIONS
+          PACKAGE      "${i_PACKAGE}"
+          OPTION_NAME  "${_overridable_option}"
+          OPTION_LIST  ${i_DOWNLOAD_OPTIONS}
+          OUTPUT       i_DOWNLOAD_OPTIONS
           )
       else ("${_overridable_option}" IN_LIST i_DOWNLOAD_OPTIONS)
         message (
