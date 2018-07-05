@@ -55,6 +55,7 @@ function (utk_cmake_build_and_install_options)
   set (_options
     BENCHMARKS
     BENCHMARKS_ENABLED
+    EXAMPLES
     EXECUTABLE
     INSTALL_DEVEL
     MODULE_LIBRARY
@@ -133,5 +134,12 @@ function (utk_cmake_build_and_install_options)
       "Build tests" ${i_BENCHMARKS_ENABLED})
     option (${i_OPTION_PREFIX}_INSTALL_BENCHMARKS
       "Install tests with other executables" false)
+  endif ()
+
+  if (i_EXAMPLES)
+    option (${i_OPTION_PREFIX}_BUILD_EXAMPLES
+      "Build examples" ${i_EXAMPLES_ENABLED})
+    option (${i_OPTION_PREFIX}_INSTALL_EXAMPLES
+      "Install examples with other executables" false)
   endif ()
 endfunction (utk_cmake_build_and_install_options)
