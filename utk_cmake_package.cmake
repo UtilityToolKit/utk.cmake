@@ -21,7 +21,7 @@ if (NOT (CMAKE_VERSION VERSION_LESS 3.12))
   # The CMP0073 policy introduced in CMake 3.12 disables generation of <target
   # name>_LIB_DEPENDS variables when set to NEW. These variables are harmless
   # except for the INTERFACE_LIBRARY target case.
-  cmake_policy (CMP0073 NEW)
+  cmake_policy (SET CMP0073 NEW)
 endif ()
 
 set (UTK_CMAKE_PACKAGE_MODULE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
