@@ -595,7 +595,8 @@ function (_utk_cmake_target_info_functions)
   get_target_property (_target_cxx_namespace
     ${i_TARGET}  ${_property_name_prefix}UTK_CMAKE_PROJECT_CXX_NAMESPACE)
 
-  if (NOT (_target_type STREQUAL "INTERFACE_LIBRARY"))
+  if (NOT (_target_type STREQUAL "INTERFACE_LIBRARY") AND
+      NOT (_target_type STREQUAL "EXECUTABLE"))
     get_target_property (TARGET_EXPORT_HEADER
 	  ${i_TARGET}  UTK_CMAKE_EXPORT_HEADER)
 
