@@ -58,6 +58,7 @@ function (utk_cmake_build_and_install_options)
     EXAMPLES
     EXECUTABLE
     INSTALL_DEVEL
+    INTERFACE_LIBRARY
     MODULE_LIBRARY
     SHARED_LIBRARY
     SHARED_LIBRARY_ENABLED
@@ -82,6 +83,7 @@ function (utk_cmake_build_and_install_options)
 
   if (NOT
       (i_EXECUTABLE OR
+        i_INTERFACE_LIBRARY OR
         i_MODULE_LIBRARY OR
         i_SHARED_LIBRARY OR
         i_STATIC_LIBRARY OR
@@ -98,7 +100,10 @@ function (utk_cmake_build_and_install_options)
     set (${i_OPTION_PREFIX}_INSTALL_RUNTIME false PARENT_SCOPE)
   endif ()
 
-  if (i_SHARED_LIBRARY OR i_STATIC_LIBRARY OR i_INSTALL_DEVEL)
+  if (i_INTERFACE_LIBRARY OR
+      i_SHARED_LIBRARY OR
+      i_STATIC_LIBRARY OR
+      i_INSTALL_DEVEL)
     option (${i_OPTION_PREFIX}_INSTALL_DEVEL "Install development files (headers, libraries, CMake and pkg-config package files)" true)
   else ()
     set (${i_OPTION_PREFIX}_INSTALL_DEVEL false PARENT_SCOPE)
