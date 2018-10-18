@@ -1,3 +1,15 @@
+Version 0.7.2 (2018-10-18)
+
+    New features:
+
+    * Added build option for INTERFACE_LIBRARY targets
+
+
+    Fixed issues:
+
+    * Fixed INSTALL_DEVEL option processing
+
+
 Version 0.7.1 (2018-10-18)
 
     Fixed issues:
