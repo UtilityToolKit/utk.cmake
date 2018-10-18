@@ -83,6 +83,7 @@ function (utk_cmake_build_and_install_options)
 
   if (NOT
       (i_EXECUTABLE OR
+        i_INSTALL_DEVEL OR
         i_INTERFACE_LIBRARY OR
         i_MODULE_LIBRARY OR
         i_SHARED_LIBRARY OR
