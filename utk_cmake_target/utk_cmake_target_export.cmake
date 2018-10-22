@@ -149,11 +149,10 @@ function (utk_cmake_generate_export_header)
 
       string (TOUPPER "${_static_define}" _static_define)
 
-      set_target_properties (
+      target_compile_definitions (
         ${_target}
-        PROPERTIES
-        COMPILE_DEFINITIONS ${_static_define}
-        INTERFACE_COMPILE_DEFINITIONS ${_static_define}
+        PUBLIC
+        ${_static_define}
         )
     else ()
       get_target_property (_define_symbol ${_target} DEFINE_SYMBOL)
@@ -165,10 +164,10 @@ function (utk_cmake_generate_export_header)
           set (_exports_def "${_target}_EXPORTS")
         endif ()
 
-        set_target_properties (
+        target_compile_definitions (
           ${_target}
-          PROPERTIES
-          COMPILE_DEFINITIONS ${_exports_def}
+          PRIVATE
+          ${_exports_def}
           )
       endif ()
     endif ()
