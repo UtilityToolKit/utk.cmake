@@ -108,7 +108,7 @@ function (utk_cmake_name_mangling_postfix)
 
     if (MSVC)
       if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
-        set (_compatible_toolsets "${CMAKE_VS_PLATFORM_TOOLSET}")
+        set (_compatible_toolsets "v${MSVC_TOOLSET_VERSION}")
 
         if("${CMAKE_VS_PLATFORM_TOOLSET}" STREQUAL "LLVM-vs2010")
           list (APPEND _compatible_toolsets "vc100")
@@ -138,7 +138,7 @@ function (utk_cmake_name_mangling_postfix)
       else ()
         set (
           _mangling_postfix
-          "${_mangling_postfix}-${CMAKE_VS_PLATFORM_TOOLSET}-mt")
+          "${_mangling_postfix}-v${MSVC_TOOLSET_VERSION}-mt")
       endif ()
     endif (MSVC)
 
