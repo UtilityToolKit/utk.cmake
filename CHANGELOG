@@ -1,3 +1,16 @@
+Version 0.8.0 (2019-10-24)
+
+    New features:
+
+    * More consistent name mangling for MSVS with LLMV toolset.
+
+    * A function for grouping target sources for IDE.
+
+    Fixed issues:
+
+    * Fixed name mangling for MSVC.
+
+
 Version 0.7.3 (2018-10-22)
 
     Fixed issues:
