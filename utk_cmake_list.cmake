@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright 2018 Utility Tool Kit Open Source Contributors (see CREDITS.md) #
+# Copyright 2018-2019 Utility Tool Kit Open Source Contributors             #
 #                                                                           #
 # Licensed under the Apache License, Version 2.0 (the "License");           #
 # you may not use this file except in compliance with the License.          #
