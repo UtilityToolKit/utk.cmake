@@ -25,3 +25,4 @@ include (${UTK_CMAKE_TARGET_MODULE_DIR}/utk_cmake_target/utk_cmake_target_librar
 include (${UTK_CMAKE_TARGET_MODULE_DIR}/utk_cmake_target/utk_cmake_target_name_mangling.cmake)
 include (${UTK_CMAKE_TARGET_MODULE_DIR}/utk_cmake_target/utk_cmake_target_properties.cmake)
 include (${UTK_CMAKE_TARGET_MODULE_DIR}/utk_cmake_target/utk_cmake_target_qt_configuration.cmake)
+include (${UTK_CMAKE_TARGET_MODULE_DIR}/utk_cmake_target/utk_cmake_target_source_group.cmake)
